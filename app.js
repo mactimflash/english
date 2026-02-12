@@ -976,7 +976,15 @@ function bindEvents(){
     if(e.target.closest("button")) e.preventDefault();
   }, { passive:false });
 }
-
+function trackStudy() {
+  fetch("https://english-discipline.YOUR_ACCOUNT.workers.dev/study", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      uid: "student1"
+    })
+  }).catch(()=>{});
+}
 /* Init */
 (function init(){
   bindEvents();
