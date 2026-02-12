@@ -1001,3 +1001,4 @@ function trackStudy() {
   // Default tab
   setTab("learn");
 })();
+trackStudy();
