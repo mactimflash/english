@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#b0161b" />
+  <title>English Sprint – Học nhanh, nhớ lâu</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div class="app">
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">E</div>
+        <div class="brandText">
+          <div class="title">English Sprint</div>
+          <div class="subtitle">Nhớ cấu trúc • Luyện ngay • Tăng phản xạ</div>
+        </div>
+      </div>
+
+      <button class="iconBtn" id="btnSettings" aria-label="Cài đặt">
+        <span class="icon">⚙️</span>
+      </button>
+    </header>
+
+    <!-- Stats -->
+    <section class="stats">
+      <div class="statCard">
+        <div class="statLabel">Streak</div>
+        <div class="statValue"><span id="streak">0</span> 🔥</div>
+      </div>
+      <div class="statCard">
+        <div class="statLabel">Điểm</div>
+        <div class="statValue"><span id="points">0</span></div>
+      </div>
+      <div class="statCard">
+        <div class="statLabel">Hoàn thành</div>
+        <div class="statValue"><span id="done">0</span>/<span id="total">0</span></div>
+      </div>
+    </section>
+
+    <!-- Search -->
+    <section class="search">
+      <div class="searchBox">
+        <span class="icon">🔎</span>
+        <input id="searchInput" type="search" placeholder="Tìm: conditional, wish, present perfect, so sánh..." autocomplete="off" />
+        <button class="chip" id="btnClearSearch" type="button">Xoá</button>
+      </div>
+      <div class="hint">Mẹo: học mỗi mục 3 phút → làm quiz 1 phút → viết 1 câu.</div>
+    </section>
+
+    <!-- Layout -->
+    <main class="layout">
+      <!-- Left: lessons list -->
+      <aside class="sidebar" id="sidebar">
+        <div class="panelHeader">
+          <div class="panelTitle">Bài học</div>
+          <div class="panelActions">
+            <button class="chip" id="btnDaily">Daily 5'</button>
+            <button class="chip" id="btnReset">Reset</button>
+          </div>
+        </div>
+
+        <div class="lessonList" id="lessonList" aria-label="Danh sách bài học">
+          <!-- JS render -->
+        </div>
+      </aside>
+
+      <!-- Right: content -->
+      <section class="content" id="content">
+        <div class="contentHeader">
+          <div>
+            <div class="contentTitle" id="lessonTitle">Chọn một bài để bắt đầu</div>
+            <div class="contentMeta" id="lessonMeta">Flashcards • Quiz • Luyện viết • Ghi nhớ</div>
+          </div>
+
+          <div class="contentHeaderActions">
+            <button class="btn" id="btnMarkDone" type="button">✅ Đánh dấu đã học</button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs" role="tablist" aria-label="Chế độ học">
+          <button class="tab active" data-tab="learn" role="tab" aria-selected="true">Học</button>
+          <button class="tab" data-tab="cards" role="tab" aria-selected="false">Flashcards</button>
+          <button class="tab" data-tab="quiz" role="tab" aria-selected="false">Quiz</button>
+          <button class="tab" data-tab="write" role="tab" aria-selected="false">Luyện viết</button>
+        </div>
+
+        <!-- Views -->
+        <div class="views">
+          <!-- LEARN -->
+          <div class="view active" id="view-learn" data-view="learn">
+            <div class="grid2">
+              <div class="card">
+                <div class="cardTitle">Công thức</div>
+                <div class="formula" id="formulaBlock">Chọn bài học để xem công thức.</div>
+                <div class="miniRow">
+                  <button class="chip" id="btnCopyFormula" type="button">Copy</button>
+                  <button class="chip" id="btnShowTips" type="button">Tips</button>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="cardTitle">Ví dụ nhanh</div>
+                <div class="examples" id="examplesBlock"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="cardTitle">Lỗi hay gặp</div>
+              <ul class="bullets" id="mistakesBlock"></ul>
+            </div>
+
+            <div class="card">
+              <div class="cardTitle">Checklist 30 giây</div>
+              <div class="checklist" id="checklistBlock"></div>
+            </div>
+          </div>
+
+          <!-- CARDS -->
+          <div class="view" id="view-cards" data-view="cards">
+            <div class="card">
+              <div class="cardTitle">Flashcards (lật thẻ)</div>
+              <div class="cardsTop">
+                <div class="pill">Gợi ý: bấm <b>Lật</b> → tự đọc to → chọn <b>Nhớ</b>/<b>Chưa nhớ</b>.</div>
+                <div class="cardsActions">
+                  <button class="chip" id="btnPrevCard" type="button">⬅️</button>
+                  <button class="chip" id="btnFlipCard" type="button">Lật</button>
+                  <button class="chip" id="btnNextCard" type="button">➡️</button>
+                </div>
+              </div>
+
+              <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="Flashcard">
+                <div class="fcFront" id="fcFront">Chọn bài học</div>
+                <div class="fcBack" id="fcBack">Flashcards sẽ hiện ở đây</div>
+              </div>
+
+              <div class="rateRow">
+                <button class="btn ghost" id="btnAgain" type="button">❌ Chưa nhớ</button>
+                <button class="btn" id="btnRemember" type="button">✅ Nhớ</button>
+              </div>
+
+              <div class="progressLine">
+                <div class="progressBar" id="cardsProgress"></div>
+              </div>
+              <div class="small" id="cardsCounter">0/0</div>
+            </div>
+          </div>
+
+          <!-- QUIZ -->
+          <div class="view" id="view-quiz" data-view="quiz">
+            <div class="card">
+              <div class="cardTitle">Quiz 1 phút</div>
+              <div class="quizBox" id="quizBox">
+                <div class="pill">Chọn bài học để bắt đầu quiz.</div>
+              </div>
+              <div class="quizActions">
+                <button class="btn ghost" id="btnQuizSkip" type="button">Bỏ qua</button>
+                <button class="btn" id="btnQuizNext" type="button">Câu tiếp</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- WRITE -->
+          <div class="view" id="view-write" data-view="write">
+            <div class="card">
+              <div class="cardTitle">Luyện viết (3 câu)</div>
+              <div class="pill">Mục tiêu: dùng đúng công thức + 3 câu theo bối cảnh của bạn (công việc / đời sống).</div>
+
+              <div class="writeGrid">
+                <div class="writePrompt" id="writePrompt"></div>
+                <div class="writeArea">
+                  <textarea id="writeInput" rows="7" placeholder="Viết 3 câu tiếng Anh ở đây..."></textarea>
+                  <div class="miniRow">
+                    <button class="chip" id="btnSaveWriting" type="button">Lưu</button>
+                    <button class="chip" id="btnLoadWriting" type="button">Tải lại</button>
+                    <button class="chip" id="btnTemplate" type="button">Gợi ý mẫu</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card soft">
+                <div class="cardTitle">Tự kiểm tra nhanh</div>
+                <div class="selfCheck" id="selfCheck"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom nav (mobile) -->
+    <nav class="bottomNav" aria-label="Điều hướng">
+      <button class="navBtn active" data-nav="lessons">
+        <span class="navIcon">📚</span><span class="navText">Bài học</span>
+      </button>
+      <button class="navBtn" data-nav="cards">
+        <span class="navIcon">🃏</span><span class="navText">Cards</span>
+      </button>
+      <button class="navBtn" data-nav="quiz">
+        <span class="navIcon">✅</span><span class="navText">Quiz</span>
+      </button>
+      <button class="navBtn" data-nav="write">
+        <span class="navIcon">✍️</span><span class="navText">Viết</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Settings modal -->
+  <div class="modal" id="settingsModal" aria-hidden="true">
+    <div class="modalOverlay" data-close="1"></div>
+    <div class="modalCard" role="dialog" aria-modal="true" aria-label="Cài đặt">
+      <div class="modalHeader">
+        <div class="modalTitle">Cài đặt</div>
+        <button class="iconBtn" data-close="1" aria-label="Đóng">✖️</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="row">
+          <div>
+            <div class="label">Chế độ</div>
+            <div class="small">Tự động ghi nhớ & theo dõi tiến độ trên máy.</div>
+          </div>
+          <button class="chip" id="btnExport" type="button">Export tiến độ</button>
+        </div>
+
+        <div class="row">
+          <div>
+            <div class="label">Nhắc học</div>
+            <div class="small">Gợi ý: Daily 5 phút để giữ streak.</div>
+          </div>
+          <button class="chip" id="btnTodayPlan" type="button">Xem plan</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="small">
+          Tip iOS: Nếu bàn phím che input, hãy kéo trang lên nhẹ. Website này đã tối ưu safe-area.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
