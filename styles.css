@@ -490,3 +490,17 @@ body{
   .writeGrid{grid-template-columns: 1fr}
   .bottomNav{display:flex}
 }
+
+
+/* Tracking inputs */
+.textInput{
+  width:100%;
+  margin-top:6px;
+  padding:12px 12px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.18);
+  color:#fff;
+  outline:none;
+}
+.textInput::placeholder{ color: rgba(255,255,255,.45); }

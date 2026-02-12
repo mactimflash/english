@@ -235,6 +235,33 @@
           <button class="chip" id="btnTodayPlan" type="button">Xem plan</button>
         </div>
 
+
+        <div class="divider"></div>
+
+        <div class="row" style="align-items:flex-start;">
+          <div style="flex:1">
+            <div class="label">Tracking (Cloudflare Worker + Telegram)</div>
+            <div class="small">Nhập Worker URL & UID để ghi nhận “đã học”. Nếu quá lâu không học, bot sẽ cảnh báo.</div>
+
+            <div class="field" style="margin-top:10px">
+              <div class="small">Worker URL</div>
+              <input id="workerUrlInput" class="textInput" placeholder="https://...workers.dev" />
+            </div>
+
+            <div class="field" style="margin-top:10px">
+              <div class="small">UID (tên học viên)</div>
+              <input id="uidInput" class="textInput" placeholder="student1" />
+            </div>
+
+            <div class="small" id="syncStatus" style="margin-top:8px;"></div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:8px; min-width: 140px;">
+            <button class="chip" id="btnSaveTracking" type="button">Lưu</button>
+            <button class="chip" id="btnTestPing" type="button">Test ping</button>
+          </div>
+        </div>
+
         <div class="divider"></div>
 
         <div class="small">

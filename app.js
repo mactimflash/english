@@ -11,6 +11,18 @@ const $ = (s, p=document) => p.querySelector(s);
 const $$ = (s, p=document) => Array.from(p.querySelectorAll(s));
 
 const STORAGE_KEY = "english_sprint_v1";
+const TRACKING_WORKER_URL_KEY = "english_sprint_worker_url";
+const TRACKING_UID_KEY = "english_sprint_uid";
+const DEFAULT_WORKER_URL = "https://english-discipline.starlinksatellitewifi.workers.dev";
+const DEFAULT_UID = "student1";
+
+function getWorkerUrl(){
+  return (localStorage.getItem(TRACKING_WORKER_URL_KEY) || DEFAULT_WORKER_URL).trim();
+}
+function getUid(){
+  return (localStorage.getItem(TRACKING_UID_KEY) || DEFAULT_UID).trim();
+}
+
 
 const LESSONS = [
   {
@@ -573,6 +585,7 @@ function rateCard(remember=true){
 
   bumpStreak();
   addPoints(remember ? 3 : 1);
+  trackStudy("flashcard");
 
   nextCard(1);
 }
@@ -645,6 +658,7 @@ function answerQuiz(choiceIndex){
 
   bumpStreak();
   addPoints(correct ? 10 : 3);
+  trackStudy("quiz");
 
   quizLocked = true;
   renderQuiz();
@@ -665,6 +679,7 @@ function skipQuiz(){
   if(!ls) return;
   bumpStreak();
   addPoints(1);
+  trackStudy("quiz_skip");
   nextQuiz();
 }
 
@@ -695,6 +710,7 @@ function saveWriting(){
   state.writings[ls.id] = $("#writeInput").value || "";
   bumpStreak();
   addPoints(5);
+  trackStudy("writing");
   saveState();
   toast("Đã lưu luyện viết ✅");
 }
@@ -759,6 +775,7 @@ function markDone(){
   state.done[ls.id] = true;
   bumpStreak();
   addPoints(20);
+  trackStudy("done");
   saveState();
   renderLessonList($("#searchInput").value || "");
   renderStats();
@@ -785,6 +802,7 @@ function dailyPlan(){
   setSelectedLesson(pick.id);
   setTab("cards");
   toast("Daily 5' → làm 5 thẻ + 1 quiz ✅");
+  trackStudy("daily");
 }
 
 function exportProgress(){
@@ -971,18 +989,46 @@ function bindEvents(){
   $("#btnExport").addEventListener("click", exportProgress);
   $("#btnTodayPlan").addEventListener("click", showTodayPlan);
 
+  // Tracking settings (Worker URL + UID)
+  const wInput = $("#workerUrlInput");
+  const uInput = $("#uidInput");
+  const status = $("#syncStatus");
+  const setStatus = (m) => { if(status) status.textContent = m || ""; };
+
+  if(wInput) wInput.value = getWorkerUrl();
+  if(uInput) uInput.value = getUid();
+
+  $("#btnSaveTracking")?.addEventListener("click", () => {
+    const w = (wInput?.value || "").trim();
+    const u = (uInput?.value || "").trim();
+    if(w) localStorage.setItem(TRACKING_WORKER_URL_KEY, w);
+    if(u) localStorage.setItem(TRACKING_UID_KEY, u);
+    setStatus("✅ Đã lưu tracking.");
+  });
+
+  $("#btnTestPing")?.addEventListener("click", () => {
+    setStatus("⏳ Đang ping Worker…");
+    // force ping ignoring throttle
+    __lastStudyPing = 0;
+    trackStudy("test_ping");
+    setTimeout(()=> setStatus("✅ Đã gửi ping. Mở Cloudflare Worker Logs để kiểm tra."), 600);
+  });
+
   // Keep iOS safe: prevent double-tap zoom on buttons
-  document.addEventListener("touchend", (e) => {
-    if(e.target.closest("button")) e.preventDefault();
-  }, { passive:false });
 }
-function trackStudy() {
-  fetch("https://english-discipline.starlinksatellitewifi.workers.dev/study", {
+let __lastStudyPing = 0;
+function trackStudy(reason="study"){
+  const now = Date.now();
+  if(now - __lastStudyPing < 60_000) return; // throttle 60s
+  __lastStudyPing = now;
+
+  const base = getWorkerUrl().replace(/\/+$/,"");
+  const uid = getUid() || "anonymous";
+
+  fetch(base + "/study", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      uid: "student1"
-    })
+    body: JSON.stringify({ uid, reason, ts: now })
   }).catch(()=>{});
 }
 /* Init */
@@ -1001,4 +1047,4 @@ function trackStudy() {
   // Default tab
   setTab("learn");
 })();
-trackStudy();
+trackStudy("page_load");
