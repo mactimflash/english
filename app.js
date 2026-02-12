@@ -977,7 +977,7 @@ function bindEvents(){
   }, { passive:false });
 }
 function trackStudy() {
-  fetch("https://english-discipline.YOUR_ACCOUNT.workers.dev/study", {
+  fetch("https://english-discipline.starlinksatellitewifi.workers.dev/study", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
